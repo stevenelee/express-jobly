@@ -64,6 +64,28 @@ class Company {
                logo_url      AS "logoUrl"
         FROM companies
         ORDER BY name`);
+
+    return companiesRes.rows;
+  }
+
+ /** */
+  static async filter(query) {
+    const keys = Object.keys(query);
+    const values = Object.values(query);
+
+    const cols = keys.map((colName, idx) => `"${colName}"=$${idx + 1}`);
+    const setCols = cols.join(", ");
+
+    const companiesRes = await db.query(`
+        SELECT handle,
+              name,
+              description,
+              num_employees AS "numEmployees",
+              logo_url      AS "logoUrl"
+        FROM companies
+        WHERE ${setCols}
+        ORDER BY name`, [...values]);
+
     return companiesRes.rows;
   }
 
@@ -91,6 +113,7 @@ class Company {
 
     return company;
   }
+
 
   /** Update company data with `data`.
    *

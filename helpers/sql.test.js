@@ -3,7 +3,7 @@
 const { sqlForPartialUpdate } = require("./sql.js");
 const { BadRequestError } = require("../expressError");
 
-describe("createToken", function () {
+describe("partialUpdate", function () {
 
   test("works: sqlForPartialUpdate", function () {
     let data = {
@@ -11,12 +11,12 @@ describe("createToken", function () {
       description: "durr",
       numEmployees: 5,
       logoUrl: "heyo.com"
-    }
+    };
 
     let result = sqlForPartialUpdate(data, {
       numEmployees: "num_employees",
       logoUrl: "logo_url",
-    })
+    });
 
     expect(result).toEqual({
         setCols:
@@ -26,6 +26,14 @@ describe("createToken", function () {
 
   });
 
-});
+  test("fails when no data is provided", function () {
+    let data = {};
 
-// Data can include: {name, description, numEmployees, logoUrl}
+    expect(() => sqlForPartialUpdate(data, {
+        numEmployees: "num_employees",
+        logoUrl: "logo_url",
+      }))
+        .toThrow(BadRequestError);
+  });
+
+});

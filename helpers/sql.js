@@ -2,17 +2,17 @@
 
 const { BadRequestError } = require("../expressError");
 
-/** Perform a partial update of data
+/** Perform a partial update of data in database
  *
  * Receives data to be updated in an object (dataToUpdate). Extracts keys from
  * object into an array called keys. Return error if no keys exist.
  *
- * Create array cols which consists of all keys converted into a string,
- * with a position for each key as reference to corresponding value
- * in sanitized array.
+ * Creates array cols which consists of all keys (or their corresponding value
+ * from table jsToSql) converted into a string, with a position for each key
+ * to reference their corresponding value in sanitized array.
  *
  * Return object with key setCols whose value is cols converted into a string
- * with values separated by ", ", and key values whose value is an array of
+ * with elements joined by ", ", and key values whose value is an array of
  * all of the values from dataToUpdate.
  */
 
