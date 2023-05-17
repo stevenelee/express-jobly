@@ -53,24 +53,24 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
+  console.log("querrrry>>>>", req.query === {})
+
+  if (Object.keys(req.query).length === 0){
+    return res.json(await Company.findAll());
+  }
+
   const validator = jsonschema.validate(
     req.query,
     companyFilterSchema,
     {required: true}
   );
 
-  let companies;
   if(!validator.valid){
     const errs = validator.errors.map(e => e.stack);
     throw new BadRequestError(errs);
   }
-  if (validator.valid) {
-    companies = await Company.filter(req.query);
-  } else {
-    companies = await Company.findAll();
-  }
 
-  return res.json({ companies });
+  return res.json(await Company.filter(req.query));
 });
 
 /** GET /[handle]  =>  { company }
