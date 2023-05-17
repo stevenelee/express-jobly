@@ -60,6 +60,10 @@ router.get("/", async function (req, res, next) {
   );
 
   let companies;
+  if(!validator.valid){
+    const errs = validator.errors.map(e => e.stack);
+    throw new BadRequestError(errs);
+  }
   if (validator.valid) {
     companies = await Company.filter(req.query);
   } else {
