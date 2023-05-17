@@ -2,7 +2,19 @@
 
 const { BadRequestError } = require("../expressError");
 
-// THIS NEEDS SOME GREAT DOCUMENTATION.
+/** Perform a partial update of data
+ *
+ * Receives data to be updated in an object (dataToUpdate). Extracts keys from
+ * object into an array called keys. Return error if no keys exist.
+ *
+ * Create array cols which consists of all keys converted into a string,
+ * with a position for each key as reference to corresponding value
+ * in sanitized array.
+ *
+ * Return object with key setCols whose value is cols converted into a string
+ * with values separated by ", ", and key values whose value is an array of
+ * all of the values from dataToUpdate.
+ */
 
 function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   const keys = Object.keys(dataToUpdate);
