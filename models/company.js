@@ -78,17 +78,18 @@ class Company {
 
     let colsFiltered = [];
 
-    if (minEmployees){
-      colsFiltered.push(`"num_employees">${minEmployees}`)
-    } else if (maxEmployees){
-      colsFiltered.push(`"num_employees"<${maxEmployees}`)
-    } else if (nameLike){
+    if (nameLike){
       colsFiltered.push(`"name" ILIKE '%${nameLike}%'`)
+    } else if (minEmployees){
+      colsFiltered.push(`"num_employees">=${minEmployees}`)
+    } else if (maxEmployees){
+      colsFiltered.push(`"num_employees"<=${maxEmployees}`)
     }
-    
+
     for (let i=0; i<colsFiltered.length; i++){
       if (colsFiltered[i+1]){
-        colsFiltered.splice(i+1, 0, 'AND')
+        colsFiltered.splice(i+1, 0, 'AND');
+        i++;
       }
     }
 
