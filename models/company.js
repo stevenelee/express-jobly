@@ -70,11 +70,29 @@ class Company {
 
  /** */
   static async filter(query) {
-    const keys = Object.keys(query);
-    const values = Object.values(query);
+    const {nameLike, minEmployees, maxEmployees} = query;
 
-    const cols = keys.map((colName, idx) => `"${colName}"=$${idx + 1}`);
-    const setCols = cols.join(", ");
+    if (minEmployees > maxEmployees){
+      throw new BadRequestError(`Min cannot be greater than max!`);
+    }
+
+    let colsFiltered = [];
+
+    if (minEmployees){
+      colsFiltered.push(`"num_employees">${minEmployees}`)
+    } else if (maxEmployees){
+      colsFiltered.push(`"num_employees"<${maxEmployees}`)
+    } else if (nameLike){
+      colsFiltered.push(`"name" ILIKE '%${nameLike}%'`)
+    }
+    
+    for (let i=0; i<colsFiltered.length; i++){
+      if (colsFiltered[i+1]){
+        colsFiltered.splice(i+1, 0, 'AND')
+      }
+    }
+
+    const setCols = colsFiltered.join(", ");
 
     const companiesRes = await db.query(`
         SELECT handle,
@@ -84,7 +102,7 @@ class Company {
               logo_url      AS "logoUrl"
         FROM companies
         WHERE ${setCols}
-        ORDER BY name`, [...values]);
+        ORDER BY name`);
 
     return companiesRes.rows;
   }
