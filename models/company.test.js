@@ -179,28 +179,36 @@ describe("filter", function () {
     ]);
   });
 
-  //might need async in 183?
-  test("throw error when minEmployees > maxEmployees", function () {
-    expect(async() => await Company.filter({nameLike: "c",
-                                            minEmployees: 3,
-                                            maxEmployees: 2
-    }))
-      .toThrow(BadRequestError);
+  test("throw error when minEmployees > maxEmployees", async function () {
+    try {
+      await Company.filter({nameLike: "c",
+                            minEmployees: 3,
+                            maxEmployees: 2
+     });
+      throw new Error("fail test, you shouldn't get here");
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
   });
 
-  test("returns empty array if no results found pt.1", async function () {
+  test("returns empty array if no nameLike matches", async function () {
     let companies = await Company.filter({nameLike: "d",
                                           minEmployees: 1,
                                           maxEmployees: 3});
     expect(companies).toEqual([]);
   });
 
-  test("returns empty array if no results found pt.2", async function () {
+  test("returns empty array if minEmployees not met", async function () {
     let companies = await Company.filter({nameLike: "c",
                                           minEmployees: 4});
     expect(companies).toEqual([]);
   });
 
+  test("returns empty array if maxEmployees not met", async function () {
+    let companies = await Company.filter({nameLike: "c",
+                                          maxEmployees: .5});
+    expect(companies).toEqual([]);
+  });
 });
 
 /************************************** get */

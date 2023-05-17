@@ -54,7 +54,7 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
 
 router.get("/", async function (req, res, next) {
   const validator = jsonschema.validate(
-    req.body,
+    req.query,
     companyFilterSchema,
     {required: true}
   );

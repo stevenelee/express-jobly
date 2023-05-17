@@ -68,7 +68,10 @@ class Company {
     return companiesRes.rows;
   }
 
- /** */
+ /** Receives object. If minEmployees > maxEmployees, throw error. Otherwise, structure passed
+  * in args into SQL format. If multiple args passed in, add the "AND" keyword
+  * between them. Make the query and return array of results.
+  */
   static async filter(query) {
     const {nameLike, minEmployees, maxEmployees} = query;
 
@@ -78,13 +81,12 @@ class Company {
 
     let colsFiltered = [];
 
-    if (nameLike){
-      colsFiltered.push(`"name" ILIKE '%${nameLike}%'`)
-    } else if (minEmployees){
-      colsFiltered.push(`"num_employees">=${minEmployees}`)
-    } else if (maxEmployees){
-      colsFiltered.push(`"num_employees"<=${maxEmployees}`)
-    }
+    if (nameLike)colsFiltered.push(`"name" ILIKE '%${nameLike}%'`);
+
+    if (minEmployees)colsFiltered.push(`"num_employees">=${minEmployees}`);
+
+    if (maxEmployees)colsFiltered.push(`"num_employees"<=${maxEmployees}`);
+
 
     for (let i=0; i<colsFiltered.length; i++){
       if (colsFiltered[i+1]){
@@ -93,7 +95,7 @@ class Company {
       }
     }
 
-    const setCols = colsFiltered.join(", ");
+    const setCols = colsFiltered.join(" ");
 
     const companiesRes = await db.query(`
         SELECT handle,
