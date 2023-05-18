@@ -40,7 +40,10 @@ function ensureLoggedIn(req, res, next) {
   throw new UnauthorizedError();
 }
 
-/** Require admin user or raise 401 */
+/** Require user to be an admin.
+ *
+ * If not, raises Unauthorized.
+ */
 
 function ensureAdmin(req, res, next) {
   const user = res.locals.user;

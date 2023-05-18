@@ -5,8 +5,8 @@
 const jsonschema = require("jsonschema");
 
 const express = require("express");
-const { ensureLoggedIn } = require("../middleware/auth");
-const { BadRequestError } = require("../expressError");
+const { ensureLoggedIn, ensureAdmin } = require("../middleware/auth");
+const { BadRequestError, UnauthorizedError } = require("../expressError");
 const User = require("../models/user");
 const { createToken } = require("../helpers/tokens");
 const userNewSchema = require("../schemas/userNew.json");
@@ -27,7 +27,7 @@ const router = express.Router();
  * Authorization required: login
  **/
 
-router.post("/", ensureLoggedIn, async function (req, res, next) {
+router.post("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
   const validator = jsonschema.validate(
       req.body,
       userNewSchema,
@@ -51,7 +51,7 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  * Authorization required: login
  **/
 
-router.get("/", ensureLoggedIn, async function (req, res, next) {
+router.get("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
   const users = await User.findAll();
   return res.json({ users });
 });
@@ -66,6 +66,11 @@ router.get("/", ensureLoggedIn, async function (req, res, next) {
 
 router.get("/:username", ensureLoggedIn, async function (req, res, next) {
   const user = await User.get(req.params.username);
+
+  if (!res.locals.user.isAdmin && res.locals.user.username !== req.params.username) {
+    throw new UnauthorizedError();
+  }
+
   return res.json({ user });
 });
 
@@ -92,6 +97,11 @@ router.patch("/:username", ensureLoggedIn, async function (req, res, next) {
   }
 
   const user = await User.update(req.params.username, req.body);
+
+  if (!res.locals.user.isAdmin && res.locals.user.username !== req.params.username) {
+    throw new UnauthorizedError();
+  }
+
   return res.json({ user });
 });
 
@@ -103,6 +113,11 @@ router.patch("/:username", ensureLoggedIn, async function (req, res, next) {
 
 router.delete("/:username", ensureLoggedIn, async function (req, res, next) {
   await User.remove(req.params.username);
+
+  if (!res.locals.user.isAdmin && res.locals.user.username !== req.params.username) {
+  throw new UnauthorizedError();
+  }
+
   return res.json({ deleted: req.params.username });
 });
 

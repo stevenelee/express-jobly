@@ -50,8 +50,12 @@ class Company {
     return company;
   }
 
-  /** Find all companies.
-   *
+  /** Find all companies. Extracts values from object filter if provided; if not,
+   * default to empty object.
+   * Return error if minEmployees > maxEmployees.
+   * Perform filter method to create query string and extract values for each
+   * query parameter.
+   * Search database based on query.
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
 
@@ -77,9 +81,11 @@ class Company {
     return companiesRes.rows;
   }
 
- /** Receives object. If minEmployees > maxEmployees, throw error. Otherwise, structure passed
-  * in args into SQL format. If multiple args passed in, add the "AND" keyword
-  * between them. Make the query and return array of results.
+ /** Receives object. Extracts values from object, pushes into valuesFiltered.
+  * Creates string for each value, pushes into colsFiltered.
+  * Joins elements in colsFiltered to create string setCols.
+  * Creates query string strTotal by concatenating 'WHERE' with setCols.
+  * Returns object with strTotal and colsFiltered.
   */
   static _filter(filter) {
     const {nameLike, minEmployees, maxEmployees} = filter;
