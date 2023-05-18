@@ -15,6 +15,8 @@ beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
 
+/************************************** create */
+
 describe ("create", function () {
   const newJob = {
     title: "new",
@@ -41,5 +43,81 @@ describe ("create", function () {
       }
     ]);
   });
-
 });
+  /************************************** findAll */
+
+  describe("findAll", function () {
+    test("works: no filter", async function () {
+      let jobs = await Job.findAll();
+      expect(jobs).toEqual([
+        {
+          title: "j1",
+          salary: 1,
+          equity: .1,
+          company_handle: "c1",
+        },
+        {
+          title: "j2",
+          salary: 2,
+          equity: .2,
+          company_handle: "c2",
+        },
+        {
+          title: "j3",
+          salary: 3,
+          equity: .3,
+          company_handle: "c3",
+        },
+      ]);
+    });
+
+    test("works: with filter title", async function () {
+      let job = await Job.findAll({title: "j3"});
+      expect(job).toEqual([
+        {
+          title: "j3",
+          salary: 3,
+          equity: .3,
+          company_handle: "c3",
+        },
+      ]);
+    });
+
+    test("works: with filter w/all criteria", async function () {
+      let jobs = await Company.findAll({title: "j",
+                                             minSalary: 2,
+                                             hasEquity: true});
+      expect(jobs).toEqual([
+        {
+          title: "j2",
+          salary: 2,
+          equity: .2,
+          company_handle: "c2",
+        },
+        {
+          title: "j3",
+          salary: 3,
+          equity: .3,
+          company_handle: "c3",
+        },
+      ]);
+    });
+
+    test("throws error: filter w/all criteria but no matches", async function () {
+      try {
+        let jobs = await Company.findAll({title: "j",
+                                             minSalary: 2,
+                                             hasEquity: false});
+        throw new Error("fail test, you shouldn't get here");
+      } catch (err) {
+        expect(err instanceof NotFoundError).toBeTruthy();
+      }
+    });
+
+
+
+
+  });
+    /************************************** filter */
+
+
