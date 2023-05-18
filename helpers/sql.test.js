@@ -5,7 +5,7 @@ const { BadRequestError } = require("../expressError");
 
 describe("partialUpdate", function () {
 
-  test("works: sqlForPartialUpdate", function () {
+  test("works when all fields provided: sqlForPartialUpdate", function () {
     let data = {
       name: "Hufflepuff",
       description: "durr",
@@ -26,6 +26,25 @@ describe("partialUpdate", function () {
 
   });
 
+  test("works when not all fields provided: sqlForPartialUpdate", function () {
+    let data = {
+      name: "Hufflepuff",
+      logoUrl: "heyo.com"
+    };
+
+    let result = sqlForPartialUpdate(data, {
+      numEmployees: "num_employees",
+      logoUrl: "logo_url",
+    });
+
+    expect(result).toEqual({
+        setCols:
+            `"name"=$1, "logo_url"=$2`,
+        values: ["Hufflepuff", "heyo.com"]
+    });
+
+  });
+
   test("fails when no data is provided", function () {
     let data = {};
 
@@ -35,5 +54,4 @@ describe("partialUpdate", function () {
       }))
         .toThrow(BadRequestError);
   });
-//TODO: add another test to make sure data can be updated with not all fields provided
 });

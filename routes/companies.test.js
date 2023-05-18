@@ -119,7 +119,7 @@ describe("GET /companies", function () {
     expect(resp.body.error.message[0]).toEqual("instance is not allowed to have the additional property \"nameLik\"");
   });
 
-  test("approved query params passed through", async function () {
+  test("approved query param passed through", async function () {
     const resp = await request(app).get("/companies?nameLike=c1");
     expect(resp.body).toEqual({
       companies:
@@ -134,7 +134,30 @@ describe("GET /companies", function () {
           ],
     });
   });
-//TODO: test one with all query params passed through, and with no item returned
+
+  test("all approved query param passed through", async function () {
+    const resp = await request(app).get("/companies?nameLike=c&minEmployees=3&maxEmployees=5");
+    expect(resp.body).toEqual({
+      companies:
+          [
+            {
+              handle: "c3",
+              name: "C3",
+              description: "Desc3",
+              numEmployees: 3,
+              logoUrl: "http://c3.img",
+            },
+          ],
+    });
+  });
+
+  test("all approved query param passed through with no result", async function () {
+    const resp = await request(app).get("/companies?nameLike=c&minEmployees=4&maxEmployees=5");
+    expect(resp.body).toEqual({
+      companies:
+          [],
+    });
+  });
 });
 
 /************************************** GET /companies/:handle */
