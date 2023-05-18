@@ -54,7 +54,6 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
 
 router.get("/", async function (req, res, next) {
   let reqQueries = {...req.query};
-  console.log()
 
   if (reqQueries.maxEmployees){
     reqQueries.maxEmployees = Number(reqQueries.maxEmployees);
@@ -73,7 +72,7 @@ router.get("/", async function (req, res, next) {
     const errs = validator.errors.map(e => e.stack);
     throw new BadRequestError(errs);
   }
-  console.log("reqQueries>>>>", reqQueries);
+
   const companies = await Company.findAll(reqQueries);
   return res.json({ companies })
 });

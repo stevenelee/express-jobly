@@ -85,21 +85,10 @@ describe("findAll", function () {
       },
     ]);
   });
-});
 
-/************************************** filter */
-
-describe("filter", function () {
-  test("filter works with nameLike", async function () {
-    let companies = await Company.filter({nameLike: "c"});
+  test("works: with filter", async function () {
+    let companies = await Company.findAll({minEmployees: 2});
     expect(companies).toEqual([
-      {
-        handle: "c1",
-        name: "C1",
-        description: "Desc1",
-        numEmployees: 1,
-        logoUrl: "http://c1.img",
-      },
       {
         handle: "c2",
         name: "C2",
@@ -113,12 +102,14 @@ describe("filter", function () {
         description: "Desc3",
         numEmployees: 3,
         logoUrl: "http://c3.img",
-      }
+      },
     ]);
   });
 
-  test("filter works with minEmployees", async function () {
-    let companies = await Company.filter({minEmployees: 3});
+  test("works: with filter w/all criteria", async function () {
+    let companies = await Company.findAll({nameLike: "c",
+                                           minEmployees: 3,
+                                           maxEmployees: 5});
     expect(companies).toEqual([
       {
         handle: "c3",
@@ -126,62 +117,13 @@ describe("filter", function () {
         description: "Desc3",
         numEmployees: 3,
         logoUrl: "http://c3.img",
-      }
-    ]);
-  });
-
-  test("filter works with maxEmployees", async function () {
-    let companies = await Company.filter({maxEmployees: 1});
-    expect(companies).toEqual([
-      {
-        handle: "c1",
-        name: "C1",
-        description: "Desc1",
-        numEmployees: 1,
-        logoUrl: "http://c1.img",
-      }
-    ]);
-  });
-
-  test("filter works with two criteria", async function () {
-    let companies = await Company.filter({minEmployees: 1,
-                                          maxEmployees: 2});
-    expect(companies).toEqual([
-      {
-        handle: "c1",
-        name: "C1",
-        description: "Desc1",
-        numEmployees: 1,
-        logoUrl: "http://c1.img",
       },
-      {
-        handle: "c2",
-        name: "C2",
-        description: "Desc2",
-        numEmployees: 2,
-        logoUrl: "http://c2.img",
-      }
-    ]);
-  });
-
-  test("filter works with all criteria", async function () {
-    let companies = await Company.filter({nameLike: "c",
-                                          minEmployees: 2,
-                                          maxEmployees: 2});
-    expect(companies).toEqual([
-      {
-        handle: "c2",
-        name: "C2",
-        description: "Desc2",
-        numEmployees: 2,
-        logoUrl: "http://c2.img",
-      }
     ]);
   });
 
   test("throw error when minEmployees > maxEmployees", async function () {
     try {
-      await Company.filter({nameLike: "c",
+      await Company.findAll({nameLike: "c",
                             minEmployees: 3,
                             maxEmployees: 2
      });
@@ -191,24 +133,69 @@ describe("filter", function () {
     }
   });
 
-  test("returns empty array if no nameLike matches", async function () {
-    let companies = await Company.filter({nameLike: "d",
-                                          minEmployees: 1,
-                                          maxEmployees: 3});
-    expect(companies).toEqual([]);
+});
+
+
+/************************************** filter */
+
+describe("filter", function () {
+  test("filter works with nameLike", function () {
+    let results = Company._filter({nameLike: "c"});
+    expect(results).toEqual(
+      {
+        strTotal: `WHERE "name" ILIKE '%' || $1 || '%'`,
+        valuesFiltered: ["c"]
+      }
+    );
   });
 
-  test("returns empty array if minEmployees not met", async function () {
-    let companies = await Company.filter({nameLike: "c",
-                                          minEmployees: 4});
-    expect(companies).toEqual([]);
+  test("filter works with minEmployees", function () {
+    let results = Company._filter({minEmployees: 3});
+    expect(results).toEqual(
+      {
+        strTotal: `WHERE "num_employees">=$1`,
+        valuesFiltered: [3]
+      }
+    );
   });
 
-  test("returns empty array if maxEmployees not met", async function () {
-    let companies = await Company.filter({nameLike: "c",
-                                          maxEmployees: .5});
-    expect(companies).toEqual([]);
+  test("filter works with maxEmployees", function () {
+    let results = Company._filter({maxEmployees: 1});
+    expect(results).toEqual(
+      {
+        strTotal: `WHERE "num_employees"<=$1`,
+        valuesFiltered: [1]
+      }
+    );
   });
+
+  test("filter works with two criteria", function () {
+    let results = Company._filter({minEmployees: 1, maxEmployees: 2});
+    expect(results).toEqual(
+      {
+        strTotal: `WHERE "num_employees">=$1 AND "num_employees"<=$2`,
+        valuesFiltered: [1, 2]
+      }
+    );
+  });
+
+  test("filter works with all criteria", function () {
+    let results = Company._filter({nameLike: "c",
+                                  minEmployees: 2,
+                                  maxEmployees: 2});
+    expect(results).toEqual(
+      {
+        strTotal: `WHERE "name" ILIKE '%' || $1 || '%' AND "num_employees">=$2 AND "num_employees"<=$3`,
+        valuesFiltered: ["c", 2, 2]
+      }
+    );
+  });
+
+  test("returns object with no values for keys if no criteria", function () {
+    let results = Company._filter({});
+    expect(results).toEqual({strTotal: "", valuesFiltered: []});
+  });
+
 });
 
 /************************************** get */

@@ -57,14 +57,12 @@ class Company {
 
   static async findAll(filter = {}) {
     const {nameLike, minEmployees, maxEmployees} = filter;
-    console.log("minEmployees>>>>", minEmployees);
 
     if (minEmployees > maxEmployees){
       throw new BadRequestError(`Min cannot be greater than max!`);
     }
 
-    const sqlFiltered =  Company.filter(filter);
-    console.log("sqlFiltered>>>>", sqlFiltered);
+    const sqlFiltered =  Company._filter(filter);
 
     const companiesRes = await db.query(`
         SELECT handle,
@@ -83,7 +81,7 @@ class Company {
   * in args into SQL format. If multiple args passed in, add the "AND" keyword
   * between them. Make the query and return array of results.
   */
-  static filter(filter) {
+  static _filter(filter) {
     const {nameLike, minEmployees, maxEmployees} = filter;
 
     let colsFiltered = [];
@@ -108,8 +106,6 @@ class Company {
     let setCols = colsFiltered.join(" AND ");
      strTotal += `WHERE ` + setCols
     }
-    console.log("valuesFiltered>>>>>", valuesFiltered);
-    console.log("strTotal>>>>>", strTotal);
 
     return {strTotal, valuesFiltered}
   }

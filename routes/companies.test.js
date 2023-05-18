@@ -105,7 +105,7 @@ describe("GET /companies", function () {
   test("approved query params passed through", async function () {
     const resp = await request(app).get("/companies?nameLike=c1");
     expect(resp.body).toEqual({
-      companiesFiltered:
+      companies:
           [
             {
               handle: "c1",
@@ -117,7 +117,7 @@ describe("GET /companies", function () {
           ],
     });
   });
-//TODO: test one with all query params passed through
+//TODO: test one with all query params passed through, and with no item returned
 });
 
 /************************************** GET /companies/:handle */
