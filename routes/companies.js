@@ -53,15 +53,18 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
-  if (Object.keys(req.query).length === 0){
-    const companies = await Company.findAll();
-    return res.json({ companies })
+  let reqQueries = {...req.query};
+  console.log()
+
+  if (reqQueries.maxEmployees){
+    reqQueries.maxEmployees = Number(reqQueries.maxEmployees);
+  }
+  if (reqQueries.minEmployees){
+    reqQueries.minEmployees = Number(reqQueries.minEmployees);
   }
 
-  //TODO: make copy of req.query, check to see if min and maxemployees are undefined,
-  //convert to integers, pass copy of req.query through
   const validator = jsonschema.validate(
-    req.query,
+    reqQueries,
     companyFilterSchema,
     {required: true}
   );
@@ -70,9 +73,9 @@ router.get("/", async function (req, res, next) {
     const errs = validator.errors.map(e => e.stack);
     throw new BadRequestError(errs);
   }
-
-  const companiesFiltered = await Company.filter(req.query);
-  return res.json({ companiesFiltered })
+  console.log("reqQueries>>>>", reqQueries);
+  const companies = await Company.findAll(reqQueries);
+  return res.json({ companies })
 });
 
 /** GET /[handle]  =>  { company }

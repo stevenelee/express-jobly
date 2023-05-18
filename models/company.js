@@ -57,10 +57,14 @@ class Company {
 
   static async findAll(filter = {}) {
     const {nameLike, minEmployees, maxEmployees} = filter;
+    console.log("minEmployees>>>>", minEmployees);
 
     if (minEmployees > maxEmployees){
       throw new BadRequestError(`Min cannot be greater than max!`);
     }
+
+    const sqlFiltered =  Company.filter(filter);
+    console.log("sqlFiltered>>>>", sqlFiltered);
 
     const companiesRes = await db.query(`
         SELECT handle,
@@ -69,8 +73,9 @@ class Company {
                num_employees AS "numEmployees",
                logo_url      AS "logoUrl"
         FROM companies
-        ORDER BY name`);
-//TODO: add ${where} after FROM
+        ${sqlFiltered.strTotal}
+        ORDER BY name`, sqlFiltered.valuesFiltered);
+
     return companiesRes.rows;
   }
 
@@ -78,39 +83,35 @@ class Company {
   * in args into SQL format. If multiple args passed in, add the "AND" keyword
   * between them. Make the query and return array of results.
   */
-  static async filter(query) {
-//TODO: call filter in findAll!
-//TODO: use sanitized values!!
+  static filter(filter) {
+    const {nameLike, minEmployees, maxEmployees} = filter;
 
     let colsFiltered = [];
-    //TODO: valuesFiltered = [];
+    let valuesFiltered = [];
 
-    //TODO: push to both arrays, but to values FIRST
-    if (nameLike)colsFiltered.push(`"name" ILIKE '%${nameLike}%'`);
-    if (minEmployees)colsFiltered.push(`"num_employees">=${minEmployees}`);
-    if (maxEmployees)colsFiltered.push(`"num_employees"<=${maxEmployees}`);
-
-    //TODO: use join instead of splice
-    for (let i=0; i<colsFiltered.length; i++){
-      if (colsFiltered[i+1]){
-        colsFiltered.splice(i+1, 0, 'AND');
-        i++;
-      }
+    if (nameLike){
+      valuesFiltered.push(nameLike);
+      colsFiltered.push(`"name" ILIKE '%' || $${valuesFiltered.length} || '%'`);
+    }
+    if (minEmployees){
+      valuesFiltered.push(minEmployees);
+      colsFiltered.push(`"num_employees">=$${valuesFiltered.length}`);
+    }
+    if (maxEmployees){
+      valuesFiltered.push(maxEmployees);
+      colsFiltered.push(`"num_employees"<=$${valuesFiltered.length}`);
     }
 
-    const setCols = colsFiltered.join(" ");
+    let strTotal ='';
 
-    const companiesRes = await db.query(`
-        SELECT handle,
-              name,
-              description,
-              num_employees AS "numEmployees",
-              logo_url      AS "logoUrl"
-        FROM companies
-        WHERE ${setCols}
-        ORDER BY name`);
+    if (colsFiltered.length !== 0){
+    let setCols = colsFiltered.join(" AND ");
+     strTotal += `WHERE ` + setCols
+    }
+    console.log("valuesFiltered>>>>>", valuesFiltered);
+    console.log("strTotal>>>>>", strTotal);
 
-    return companiesRes.rows;
+    return {strTotal, valuesFiltered}
   }
 
   /** Given a company handle, return data about company.
