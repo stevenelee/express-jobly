@@ -53,12 +53,13 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
-  console.log("querrrry>>>>", req.query === {})
-
   if (Object.keys(req.query).length === 0){
-    return res.json(await Company.findAll());
+    const companies = await Company.findAll();
+    return res.json({ companies })
   }
 
+  //TODO: make copy of req.query, check to see if min and maxemployees are undefined,
+  //convert to integers, pass copy of req.query through
   const validator = jsonschema.validate(
     req.query,
     companyFilterSchema,
@@ -70,7 +71,8 @@ router.get("/", async function (req, res, next) {
     throw new BadRequestError(errs);
   }
 
-  return res.json(await Company.filter(req.query));
+  const companiesFiltered = await Company.filter(req.query);
+  return res.json({ companiesFiltered })
 });
 
 /** GET /[handle]  =>  { company }

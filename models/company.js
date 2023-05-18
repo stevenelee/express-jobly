@@ -55,7 +55,13 @@ class Company {
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
 
-  static async findAll() {
+  static async findAll(filter = {}) {
+    const {nameLike, minEmployees, maxEmployees} = filter;
+
+    if (minEmployees > maxEmployees){
+      throw new BadRequestError(`Min cannot be greater than max!`);
+    }
+
     const companiesRes = await db.query(`
         SELECT handle,
                name,
@@ -64,7 +70,7 @@ class Company {
                logo_url      AS "logoUrl"
         FROM companies
         ORDER BY name`);
-
+//TODO: add ${where} after FROM
     return companiesRes.rows;
   }
 
@@ -73,21 +79,18 @@ class Company {
   * between them. Make the query and return array of results.
   */
   static async filter(query) {
-    const {nameLike, minEmployees, maxEmployees} = query;
-
-    if (minEmployees > maxEmployees){
-      throw new BadRequestError(`Min cannot be greater than max!`);
-    }
+//TODO: call filter in findAll!
+//TODO: use sanitized values!!
 
     let colsFiltered = [];
+    //TODO: valuesFiltered = [];
 
+    //TODO: push to both arrays, but to values FIRST
     if (nameLike)colsFiltered.push(`"name" ILIKE '%${nameLike}%'`);
-
     if (minEmployees)colsFiltered.push(`"num_employees">=${minEmployees}`);
-
     if (maxEmployees)colsFiltered.push(`"num_employees"<=${maxEmployees}`);
 
-
+    //TODO: use join instead of splice
     for (let i=0; i<colsFiltered.length; i++){
       if (colsFiltered[i+1]){
         colsFiltered.splice(i+1, 0, 'AND');

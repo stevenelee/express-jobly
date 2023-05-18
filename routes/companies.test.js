@@ -96,12 +96,28 @@ describe("GET /companies", function () {
     });
   });
 
-  test("schema.validates throws error for non-approved prop", async function () {
-    const resp = await request(app).get("/companies?nameLik=test");
+  test("schema.validates throws error for non-approved params", async function () {
+    const resp = await request(app).get("/companies?nameLik=c1");
     expect(resp.statusCode).toEqual(400);
-    expect(resp.body.message[0]).toEqual("instance is not allowed to have the additional property \"nameLik\"");
+    expect(resp.body.error.message[0]).toEqual("instance is not allowed to have the additional property \"nameLik\"");
   });
 
+  test("approved query params passed through", async function () {
+    const resp = await request(app).get("/companies?nameLike=c1");
+    expect(resp.body).toEqual({
+      companiesFiltered:
+          [
+            {
+              handle: "c1",
+              name: "C1",
+              description: "Desc1",
+              numEmployees: 1,
+              logoUrl: "http://c1.img",
+            }
+          ],
+    });
+  });
+//TODO: test one with all query params passed through
 });
 
 /************************************** GET /companies/:handle */

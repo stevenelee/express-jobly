@@ -35,5 +35,5 @@ describe("partialUpdate", function () {
       }))
         .toThrow(BadRequestError);
   });
-
+//TODO: add another test to make sure data can be updated with not all fields provided
 });
