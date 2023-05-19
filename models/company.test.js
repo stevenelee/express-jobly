@@ -201,7 +201,7 @@ describe("filter", function () {
 /************************************** get */
 
 describe("get", function () {
-  test("works", async function () {
+  test("works with company with jobs", async function () {
     let company = await Company.get("c1");
     expect(company).toEqual({
       handle: "c1",
@@ -209,6 +209,24 @@ describe("get", function () {
       description: "Desc1",
       numEmployees: 1,
       logoUrl: "http://c1.img",
+      jobs: [{
+        id: expect.any(Number),
+        title: "j1",
+        salary: 1,
+        equity: "0",
+        companyHandle: "c1"
+      }]
+    });
+  });
+
+  test("works with company without jobs", async function () {
+    let company = await Company.get("c2");
+    expect(company).toEqual({
+      handle: "c2",
+      name: "C2",
+      description: "Desc2",
+      numEmployees: 2,
+      logoUrl: "http://c2.img"
     });
   });
 
