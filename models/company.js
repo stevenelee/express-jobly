@@ -60,7 +60,7 @@ class Company {
    * */
 
   static async findAll(filter = {}) {
-    const {nameLike, minEmployees, maxEmployees} = filter;
+    const {minEmployees, maxEmployees} = filter;
 
     if (minEmployees > maxEmployees){
       throw new BadRequestError(`Min cannot be greater than max!`);
