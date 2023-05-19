@@ -53,22 +53,25 @@ describe("findAll", function () {
     let jobs = await Job.findAll();
     expect(jobs).toEqual([
       {
+        id: expect.any(Number),
         title: "j1",
         salary: 1,
         equity: 0,
-        company_handle: "c1",
+        companyHandle: "c1",
       },
       {
+        id: expect.any(Number),
         title: "j2",
         salary: 2,
         equity: .2,
-        company_handle: "c2",
+        companyHandle: "c2",
       },
       {
+        id: expect.any(Number),
         title: "j3",
         salary: 3,
         equity: .3,
-        company_handle: "c3",
+        companyHandle: "c3",
       },
     ]);
   });
@@ -77,10 +80,11 @@ describe("findAll", function () {
     let job = await Job.findAll({title: "j3"});
     expect(job).toEqual([
       {
+        id: expect.any(Number),
         title: "j3",
         salary: 3,
         equity: .3,
-        company_handle: "c3",
+        companyHandle: "c3",
       },
     ]);
   });
@@ -91,16 +95,18 @@ describe("findAll", function () {
                                             hasEquity: true});
     expect(jobs).toEqual([
       {
+        id: expect.any(Number),
         title: "j2",
         salary: 2,
         equity: .2,
-        company_handle: "c2",
+        companyHandle: "c2",
       },
       {
+        id: expect.any(Number),
         title: "j3",
         salary: 3,
         equity: .3,
-        company_handle: "c3",
+        companyHandle: "c3",
       },
     ]);
   });
@@ -111,23 +117,25 @@ describe("findAll", function () {
                                             hasEquity: false});
     expect(jobs).toEqual([
       {
+        id: expect.any(Number),
         title: "j2",
         salary: 2,
         equity: .2,
-        company_handle: "c2",
+        companyHandle: "c2",
       },
       {
+        id: expect.any(Number),
         title: "j3",
         salary: 3,
         equity: .3,
-        company_handle: "c3",
+        companyHandle: "c3",
       },
     ]);
   });
 
   test("throws error: filter w/all criteria but no matches", async function () {
     try {
-      let jobs = await Company.findAll({title: "j",
+      let jobs = await Job.findAll({title: "j",
                                             minSalary: 4,
                                             hasEquity: false});
       throw new Error("fail test, you shouldn't get here");

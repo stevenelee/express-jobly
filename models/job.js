@@ -63,10 +63,13 @@ class Job {
                company_handle AS "companyHandle"
         FROM jobs
         ${sqlFiltered.strTotal}
-        ORDER BY company_handle`, sqlFiltered.valuesFiltered);
-
+        ORDER BY company_handle`, [...sqlFiltered.valuesFiltered]);
+    
     if (jobsRes.rows.length === 0) throw new NotFoundError("No jobs matching criteria found.")
 
+    for (let instance of jobsRes.rows){
+      instance.equity = Number(instance.equity)
+    }
     return jobsRes.rows;
   }
 

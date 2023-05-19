@@ -17,7 +17,7 @@
         "minimum": 0,
         "maximum": 1.0
       },
-      "company_handle": {
+      "companyHandle": {
         "type": "string",
         "minLength": 1,
         "maxLength": 10
@@ -26,6 +26,6 @@
     "additionalProperties": false,
     "required": [
       "title",
-      "company_handle"
+      "companyHandle"
     ]
   }
