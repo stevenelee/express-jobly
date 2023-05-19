@@ -206,7 +206,7 @@ class User {
     if (!user) throw new NotFoundError(`No user: ${username}`);
   }
 
-  static async apply(username, job_id)
+  // static async apply(username, job_id)
 }
 
 
