@@ -27,19 +27,21 @@ describe ("create", function () {
 
   test("works", async function () {
     let job = await Job.create(newJob);
-    expect(job).toEqual(newJob);
 
     const result = await db.query(
-      `SELECT title, salary, equity, company_handle
+      `SELECT id, title, salary, equity, company_handle AS "companyHandle"
        FROM jobs
        WHERE title = 'new'`);
-    expect(job).toEqual(newJob);
-    expect(result).toEqual(
+
+    result.rows[0].equity = Number(result.rows[0].equity);
+    expect(job).toEqual(result.rows[0]);
+    expect(result.rows[0]).toEqual(
       {
+        id: expect.any(Number),
         title: "new",
         salary: 420,
         equity: 0.69,
-        company_handle: "c1"
+        companyHandle: "c1"
       }
     );
   });
@@ -84,7 +86,7 @@ describe("findAll", function () {
   });
 
   test("works: with filter w/all criteria but equity is true", async function () {
-    let jobs = await Company.findAll({title: "j",
+    let jobs = await Job.findAll({title: "j",
                                             minSalary: 2,
                                             hasEquity: true});
     expect(jobs).toEqual([
@@ -104,7 +106,7 @@ describe("findAll", function () {
   });
 
   test("works: with filter w/all criteria but equity is false", async function () {
-    let jobs = await Company.findAll({title: "j",
+    let jobs = await Job.findAll({title: "j",
                                             minSalary: 2,
                                             hasEquity: false});
     expect(jobs).toEqual([

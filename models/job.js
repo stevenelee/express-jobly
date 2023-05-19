@@ -25,6 +25,7 @@ class Job {
                                   company_handle)
                 VALUES ($1, $2, $3, $4)
                 RETURNING
+                  id,
                   title,
                   salary,
                   equity,
@@ -36,6 +37,8 @@ class Job {
         ],
     );
     const job = result.rows[0];
+    job.equity = Number(job.equity);
+    console.log("job==========", job)
 
     return job;
   }
@@ -60,7 +63,7 @@ class Job {
                company_handle AS "companyHandle"
         FROM jobs
         ${sqlFiltered.strTotal}
-        ORDER BY name`, sqlFiltered.valuesFiltered);
+        ORDER BY company_handle`, sqlFiltered.valuesFiltered);
 
     if (jobsRes.rows.length === 0) throw new NotFoundError("No jobs matching criteria found.")
 
