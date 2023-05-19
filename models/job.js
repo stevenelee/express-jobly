@@ -15,7 +15,7 @@ class Job {
    *
    * */
 
-  static async create({ title, salary, equity, company_handle }) {
+  static async create({ title, salary, equity, companyHandle }) {
 
 
     const result = await db.query(`
@@ -25,7 +25,6 @@ class Job {
                                   company_handle)
                 VALUES ($1, $2, $3, $4)
                 RETURNING
-                  id,
                   title,
                   salary,
                   equity,
@@ -33,7 +32,7 @@ class Job {
           title,
           salary,
           equity,
-          company_handle
+          companyHandle
         ],
     );
     const job = result.rows[0];
